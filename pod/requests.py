@@ -54,6 +54,8 @@ class RequestFactory(object):
       request_dict = json.loads(request_str)["request"]
     except ValueError:
       raise MalformedRequest(request_str)
+    except KeyError:
+      raise MalformedRequest(request_str)
 
     try:
       request_type = request_dict["type"]
@@ -80,5 +82,5 @@ class Request(object):
 
 class RequestError(Exception): pass
 class UnknownRequest(RequestError): pass
-class MissingRequestType(RequestError): pass
 class MalformedRequest(RequestError): pass
+class MissingRequestType(MalformedRequest): pass

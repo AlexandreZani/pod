@@ -15,8 +15,9 @@
 #   limitations under the License.
 
 from pod.requests import *
+from pod.credentials import *
 
-class TestJSON:
+class TestRequestJSON:
   def setup_method(self, method):
     RequestFactory.REQUEST_TYPES = {}
 
@@ -92,3 +93,106 @@ class TestJSON:
     else:
       assert False
 
+  def test_JsonNoRequest(self):
+    json_str = """{
+    }
+    """
+
+    try:
+      request = RequestFactory.parseRequest(json_str, None)
+    except MalformedRequest:
+      assert True
+    else:
+      assert False
+
+class TestCredentialsJSON:
+  def setup_method(self, method):
+    CredentialsFactory.CREDENTIALS_TYPES = {}
+
+    class SampleCredentials(Credentials):
+      def getCredentialsType(self):
+        return "SampleCredentials"
+
+      def __init__(self, args = {}, database = None):
+        self.args = args
+
+    CredentialsFactory.registerCredentialsType(SampleCredentials)
+
+  def test_Json(self):
+    json_str = """{
+      "credentials": {
+         "type": "SampleCredentials",
+         "args": {
+           "first": "1",
+           "second": "2"
+        }
+      }
+    }
+    """
+
+    credentials = CredentialsFactory.parseCredentials(json_str, None)
+
+    assert 1 == int(credentials.args["first"])
+    assert 2 == int(credentials.args["second"])
+    assert "SampleCredentials" == credentials.getCredentialsType()
+
+  def test_JsonNoArgs(self):
+    json_str = """{
+      "credentials": {
+         "type": "SampleCredentials"
+      }
+    }
+    """
+
+    credentials = CredentialsFactory.parseCredentials(json_str, None)
+
+    assert "SampleCredentials" == credentials.getCredentialsType()
+
+  def test_JsonNoType(self):
+    json_str = """{
+      "credentials": {
+         "args": {
+           "first": "1",
+           "second": "2"
+        }
+      }
+    }
+    """
+
+    try:
+      credentials = CredentialsFactory.parseCredentials(json_str, None)
+    except MissingCredentialsType:
+      assert True
+    else:
+      assert False
+
+  def test_JsonMalformed(self):
+    json_str = """
+      "credentials": {
+         "type": "SampleCredentials",
+         "args": {
+           "first": "1",
+           "second": "2"
+        }
+      }
+    }
+    """
+
+    try:
+      credentials = CredentialsFactory.parseCredentials(json_str, None)
+    except MalformedCredentials:
+      assert True
+    else:
+      assert False
+
+  def test_JsonNoCredentials(self):
+    json_str = """{
+    }
+    """
+
+    try:
+      credentials = CredentialsFactory.parseCredentials(json_str, None)
+    except MalformedCredentials:
+      assert True
+    else:
+      assert False
