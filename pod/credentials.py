@@ -26,7 +26,7 @@ class CredentialsFactory(object):
   def registerCredentialsType(cred_type):
     """ Registers a new credentials type
     """
-    CredentialsFactory.CREDENTIALS_TYPES[cred_type().getCredentialsType()] = cred_type
+    CredentialsFactory.CREDENTIALS_TYPES[cred_type.CREDENTIALS_TYPE] = cred_type
 
   @staticmethod
   def unregisterCredentialsType(cred_type):
@@ -75,7 +75,7 @@ def abstract():
   raise NotImplementedError(caller + ' must be implemented in subclass')
 
 class Credentials():
-  def getCredentialsType(self): abstract()
+  pass
 
 class CredentialsError(Exception): pass
 class UnknownCredentials(CredentialsError): pass

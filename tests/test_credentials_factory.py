@@ -22,8 +22,7 @@ class TestCredentialsFactory(object):
 
   def test_register(self):
     class SampleCreds(Credentials):
-      def getCredentialsType(self):
-        return "SampleCreds"
+      CREDENTIALS_TYPE = "SampleCreds"
 
     CredentialsFactory.registerCredentialsType(SampleCreds)
 
@@ -46,15 +45,14 @@ class TestCredentialsFactory(object):
 
     try:
       CredentialsFactory.registerCredentialsType(SampleCreds)
-    except NotImplementedError:
+    except AttributeError:
       assert True
     else:
       assert False
 
   def test_getCredentials(self):
     class SampleCreds(Credentials):
-      def getCredentialsType(self):
-        return "SampleCreds"
+      CREDENTIALS_TYPE = "SampleCreds"
 
       def __init__(self, args = {}, database = None):
         pass
@@ -63,7 +61,7 @@ class TestCredentialsFactory(object):
 
     credentials = CredentialsFactory.getCredentials("SampleCreds", {}, None)
 
-    assert "SampleCreds" == credentials.getCredentialsType()
+    assert "SampleCreds" == credentials.CREDENTIALS_TYPE
 
   def test_getCredentialsWrong(self):
     try:
@@ -75,8 +73,7 @@ class TestCredentialsFactory(object):
 
   def test_unregister(self):
     class SampleCreds(Credentials):
-      def getCredentialsType(self):
-        return "SampleCreds"
+      CREDENTIALS_TYPE = "SampleCreds"
 
     CredentialsFactory.registerCredentialsType(SampleCreds)
 
@@ -91,8 +88,7 @@ class TestCredentialsFactory(object):
 
   def test_unregisterAgain(self):
     class SampleCreds(Credentials):
-      def getCredentialsType(self):
-        return "SampleCreds"
+      CREDENTIALS_TYPE = "SampleCreds"
 
     CredentialsFactory.registerCredentialsType(SampleCreds)
 

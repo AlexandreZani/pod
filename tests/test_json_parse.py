@@ -110,8 +110,7 @@ class TestCredentialsJSON:
     CredentialsFactory.CREDENTIALS_TYPES = {}
 
     class SampleCredentials(Credentials):
-      def getCredentialsType(self):
-        return "SampleCredentials"
+      CREDENTIALS_TYPE = "SampleCredentials"
 
       def __init__(self, args = {}, database = None):
         self.args = args
@@ -134,7 +133,7 @@ class TestCredentialsJSON:
 
     assert 1 == int(credentials.args["first"])
     assert 2 == int(credentials.args["second"])
-    assert "SampleCredentials" == credentials.getCredentialsType()
+    assert "SampleCredentials" == credentials.CREDENTIALS_TYPE
 
   def test_JsonNoArgs(self):
     json_str = """{
@@ -146,7 +145,7 @@ class TestCredentialsJSON:
 
     credentials = CredentialsFactory.parseCredentials(json_str, None)
 
-    assert "SampleCredentials" == credentials.getCredentialsType()
+    assert "SampleCredentials" == credentials.CREDENTIALS_TYPE
 
   def test_JsonNoType(self):
     json_str = """{
