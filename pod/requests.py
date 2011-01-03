@@ -26,16 +26,16 @@ class RequestFactory(object):
   def registerRequestType(request):
     """ Adds an available request type.
     """
-    RequestFactory.REQUEST_TYPES[request().getRequestType()] = request
+    RequestFactory.REQUEST_TYPES[request.REQUEST_TYPE] = request
 
   @staticmethod
   def unregisterRequestType(request):
     """ Removes an available request type.
     """
     try:
-      del RequestFactory.REQUEST_TYPES[request().getRequestType()]
+      del RequestFactory.REQUEST_TYPES[request.REQUEST_TYPE]
     except KeyError:
-      raise UnknownRequest("Unknown request: " + request().getRequestType())
+      raise UnknownRequest("Unknown request: " + request.REQUEST_TYPE)
 
   @staticmethod
   def getRequest(request_type, args, credentials):

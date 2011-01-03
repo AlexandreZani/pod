@@ -22,8 +22,7 @@ class TestRequestFactory(object):
 
   def test_registration(self):
     class SampleRequest(Request):
-      def getRequestType(self):
-        return "SampleRequest"
+      REQUEST_TYPE = "SampleRequest"
     RequestFactory.registerRequestType(SampleRequest)
 
     assert SampleRequest == RequestFactory.REQUEST_TYPES["SampleRequest"]
@@ -34,7 +33,7 @@ class TestRequestFactory(object):
 
     try:
       RequestFactory.registerRequestType(SampleBadRequest)
-    except NotImplementedError:
+    except AttributeError:
       assert True
     else:
       assert False
@@ -52,8 +51,7 @@ class TestRequestFactory(object):
 
   def test_getRequest(self):
     class SampleRequest(Request):
-      def getRequestType(self):
-        return "SampleRequest"
+      REQUEST_TYPE = "SampleRequest"
 
       def __init__(self, args = {}, credentials = None):
         pass
@@ -62,7 +60,7 @@ class TestRequestFactory(object):
 
     request = RequestFactory.getRequest("SampleRequest", {}, None)
 
-    assert "SampleRequest" == request.getRequestType()
+    assert "SampleRequest" == request.REQUEST_TYPE
 
   def test_getRequestWrong(self):
     try:
@@ -74,8 +72,7 @@ class TestRequestFactory(object):
 
   def test_unregistration(self):
     class SampleRequest(Request):
-      def getRequestType(self):
-        return "SampleRequest"
+      REQUEST_TYPE = "SampleRequest"
     RequestFactory.registerRequestType(SampleRequest)
 
     RequestFactory.unregisterRequestType(SampleRequest)
@@ -89,8 +86,8 @@ class TestRequestFactory(object):
 
   def test_unregistrationAgain(self):
     class SampleRequest(Request):
-      def getRequestType(self):
-        return "SampleRequest"
+      REQUEST_TYPE = "SampleRequest"
+
     RequestFactory.registerRequestType(SampleRequest)
 
     RequestFactory.unregisterRequestType(SampleRequest)

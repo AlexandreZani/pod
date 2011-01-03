@@ -22,8 +22,7 @@ class TestRequestJSON:
     RequestFactory.REQUEST_TYPES = {}
 
     class SampleRequest(Request):
-      def getRequestType(self):
-        return "SampleRequest"
+      REQUEST_TYPE = "SampleRequest"
 
       def __init__(self, args = {}, credentials = None):
         self.args = args
@@ -46,7 +45,7 @@ class TestRequestJSON:
 
     assert 1 == int(request.args["first"])
     assert 2 == int(request.args["second"])
-    assert "SampleRequest" == request.getRequestType()
+    assert "SampleRequest" == request.REQUEST_TYPE
 
   def test_JsonNoArgs(self):
     json_str = """{
@@ -58,7 +57,7 @@ class TestRequestJSON:
 
     request = RequestFactory.parseRequest(json_str, None)
 
-    assert "SampleRequest" == request.getRequestType()
+    assert "SampleRequest" == request.REQUEST_TYPE
 
   def test_JsonNoRequest(self):
     json_str = """{
