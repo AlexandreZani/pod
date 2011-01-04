@@ -20,12 +20,22 @@ from pod.credentials import *
 class TestRequestJSON:
   def setup_method(self, method):
     RequestFactory.REQUEST_TYPES = {}
+    CredentialsFactory.CREDENTIALS_TYPES = {}
+
+    class SampleCredentials(Credentials):
+      CREDENTIALS_TYPE = "SampleCredentials"
+
+      def __init__(self, args = {}, database = None):
+        self.args = args
+
+    CredentialsFactory.registerCredentialsType(SampleCredentials)
 
     class SampleRequest(Request):
       REQUEST_TYPE = "SampleRequest"
 
       def __init__(self, args = {}, credentials = None):
         self.args = args
+        self.credentials = credentials
 
     RequestFactory.registerRequestType(SampleRequest)
 
@@ -42,6 +52,36 @@ class TestRequestJSON:
     """
 
     request = RequestFactory.parseRequest(json_str, None)
+
+    assert 1 == int(request.args["first"])
+    assert 2 == int(request.args["second"])
+    assert "SampleRequest" == request.REQUEST_TYPE
+
+  def test_JsonEmbededCreds(self):
+    json_str = """{
+      "request": {
+         "type": "SampleRequest",
+         "args": {
+           "first": "1",
+           "second": "2"
+        }
+      },
+      "credentials": {
+         "type": "SampleCredentials",
+         "args": {
+           "first": "1",
+           "second": "2"
+        }
+      }
+    }
+    """
+
+    request = RequestFactory.parseRequest(json_str, None)
+    credentials = request.credentials
+
+    assert 1 == int(credentials.args["first"])
+    assert 2 == int(credentials.args["second"])
+    assert "SampleCredentials" == credentials.CREDENTIALS_TYPE
 
     assert 1 == int(request.args["first"])
     assert 2 == int(request.args["second"])

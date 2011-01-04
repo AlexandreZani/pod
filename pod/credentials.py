@@ -49,13 +49,14 @@ class CredentialsFactory(object):
     return cred_class(args, database)
 
   @staticmethod
-  def parseCredentials(credentials_str, database):
-    try:
-      credentials_dict = json.loads(credentials_str)["credentials"]
-    except ValueError:
-      raise MalformedCredentials(credentials_str)
-    except KeyError:
-      raise MalformedCredentials(credentials_str)
+  def parseCredentials(credentials_str=None, database=None, credentials_dict=None):
+    if credentials_dict == None:
+      try:
+        credentials_dict = json.loads(credentials_str)["credentials"]
+      except ValueError:
+        raise MalformedCredentials(credentials_str)
+      except KeyError:
+        raise MalformedCredentials(credentials_str)
 
     try:
       credentials_type = credentials_dict["type"]

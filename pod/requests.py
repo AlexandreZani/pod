@@ -15,6 +15,7 @@
 #   limitations under the License.
 
 import json
+from pod.credentials import *
 
 class RequestFactory(object):
   """ This factory class holds the different available request types and
@@ -49,9 +50,10 @@ class RequestFactory(object):
     return request(args, credentials)
 
   @staticmethod
-  def parseRequest(request_str, credentials):
+  def parseRequest(request_str, credentials=None, auth_db=None):
     try:
-      request_dict = json.loads(request_str)["request"]
+      msg = json.loads(request_str)
+      request_dict = msg["request"]
     except ValueError:
       raise MalformedRequest(request_str)
     except KeyError:
@@ -66,6 +68,15 @@ class RequestFactory(object):
       request_args = request_dict["args"]
     except KeyError:
       request_args = {}
+
+    if credentials == None:
+      try:
+        credentials_dict = msg["credentials"]
+        credentials = CredentialsFactory.parseCredentials(
+            credentials_dict=credentials_dict,
+            database=auth_db)
+      except KeyError:
+        credentials = None
 
     return RequestFactory.getRequest(request_type, request_args, credentials)
 
