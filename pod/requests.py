@@ -84,3 +84,4 @@ class RequestError(Exception): pass
 class UnknownRequest(RequestError): pass
 class MalformedRequest(RequestError): pass
 class MissingRequestType(MalformedRequest): pass
+class MissingRequestArgument(RequestError): pass
