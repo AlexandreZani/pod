@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-#   Copyright 2010 Alexandre Zani (alexandre.zani@gmail.com) 
+#   Copyright 2010-2011 Alexandre Zani (alexandre.zani@gmail.com) 
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -18,22 +18,23 @@ from pod.credentials import *
 
 class TestCredentialsFactory(object):
   def setup_method(self, method):
-    CredentialsFactory.CREDENTIALS_TYPES= {}
+    global credentials_factory
+    credentials_factory = CredentialsFactory()
 
   def test_register(self):
     class SampleCreds(Credentials):
       CREDENTIALS_TYPE = "SampleCreds"
 
-    CredentialsFactory.registerCredentialsType(SampleCreds)
+    credentials_factory.registerCredentialsType(SampleCreds)
 
-    assert SampleCreds == CredentialsFactory.CREDENTIALS_TYPES["SampleCreds"]
+    assert SampleCreds == credentials_factory.credentials_types["SampleCreds"]
 
   def test_registerWrongInheritence(self):
     class SampleCreds(object):
       pass
 
     try:
-      CredentialsFactory.registerCredentialsType(SampleCreds)
+      credentials_factory.registerCredentialsType(SampleCreds)
     except AttributeError:
       assert True
     else:
@@ -44,7 +45,7 @@ class TestCredentialsFactory(object):
       pass
 
     try:
-      CredentialsFactory.registerCredentialsType(SampleCreds)
+      credentials_factory.registerCredentialsType(SampleCreds)
     except AttributeError:
       assert True
     else:
@@ -57,15 +58,15 @@ class TestCredentialsFactory(object):
       def __init__(self, args = {}, database = None):
         pass
 
-    CredentialsFactory.registerCredentialsType(SampleCreds)
+    credentials_factory.registerCredentialsType(SampleCreds)
 
-    credentials = CredentialsFactory.getCredentials("SampleCreds", {}, None)
+    credentials = credentials_factory.getCredentials("SampleCreds", {}, None)
 
     assert "SampleCreds" == credentials.CREDENTIALS_TYPE
 
   def test_getCredentialsWrong(self):
     try:
-      credentials = CredentialsFactory.getCredentials("SampleCreds", {}, None)
+      credentials = credentials_factory.getCredentials("SampleCreds", {}, None)
     except UnknownCredentials:
       assert True
     else:
@@ -75,12 +76,12 @@ class TestCredentialsFactory(object):
     class SampleCreds(Credentials):
       CREDENTIALS_TYPE = "SampleCreds"
 
-    CredentialsFactory.registerCredentialsType(SampleCreds)
+    credentials_factory.registerCredentialsType(SampleCreds)
 
-    CredentialsFactory.unregisterCredentialsType("SampleCreds")
+    credentials_factory.unregisterCredentialsType("SampleCreds")
 
     try:
-      credentials = CredentialsFactory.getCredentials("SampleCreds", {}, None)
+      credentials = credentials_factory.getCredentials("SampleCreds", {}, None)
     except UnknownCredentials:
       assert True
     else:
@@ -90,12 +91,12 @@ class TestCredentialsFactory(object):
     class SampleCreds(Credentials):
       CREDENTIALS_TYPE = "SampleCreds"
 
-    CredentialsFactory.registerCredentialsType(SampleCreds)
+    credentials_factory.registerCredentialsType(SampleCreds)
 
-    CredentialsFactory.unregisterCredentialsType("SampleCreds")
+    credentials_factory.unregisterCredentialsType("SampleCreds")
 
     try:
-      CredentialsFactory.unregisterCredentialsType("SampleCreds")
+      credentials_factory.unregisterCredentialsType("SampleCreds")
     except UnknownCredentials:
       assert True
     else:

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-#   Copyright 2010 Alexandre Zani (alexandre.zani@gmail.com) 
+#   Copyright 2010-2011 Alexandre Zani (alexandre.zani@gmail.com) 
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -19,8 +19,10 @@ from pod.credentials import *
 
 class TestRequestJSON:
   def setup_method(self, method):
-    RequestFactory.REQUEST_TYPES = {}
-    CredentialsFactory.CREDENTIALS_TYPES = {}
+    global credentials_factory
+    credentials_factory = CredentialsFactory()
+    global request_factory
+    request_factory = RequestFactory()
 
     class SampleCredentials(Credentials):
       CREDENTIALS_TYPE = "SampleCredentials"
@@ -28,7 +30,7 @@ class TestRequestJSON:
       def __init__(self, args = {}, database = None):
         self.args = args
 
-    CredentialsFactory.registerCredentialsType(SampleCredentials)
+    credentials_factory.registerCredentialsType(SampleCredentials)
 
     class SampleRequest(Request):
       REQUEST_TYPE = "SampleRequest"
@@ -37,7 +39,7 @@ class TestRequestJSON:
         self.args = args
         self.credentials = credentials
 
-    RequestFactory.registerRequestType(SampleRequest)
+    request_factory.registerRequestType(SampleRequest)
 
   def test_Json(self):
     json_str = """{
@@ -51,7 +53,7 @@ class TestRequestJSON:
     }
     """
 
-    request = RequestFactory.parseRequest(json_str, None)
+    request = request_factory.parseRequest(json_str, None)
 
     assert 1 == int(request.args["first"])
     assert 2 == int(request.args["second"])
@@ -76,7 +78,8 @@ class TestRequestJSON:
     }
     """
 
-    request = RequestFactory.parseRequest(json_str, None)
+    request = request_factory.parseRequest(json_str, None,
+        credentials_factory=credentials_factory)
     credentials = request.credentials
 
     assert 1 == int(credentials.args["first"])
@@ -95,7 +98,7 @@ class TestRequestJSON:
     }
     """
 
-    request = RequestFactory.parseRequest(json_str, None)
+    request = request_factory.parseRequest(json_str, None)
 
     assert "SampleRequest" == request.REQUEST_TYPE
 
@@ -107,7 +110,7 @@ class TestRequestJSON:
     """
 
     try:
-      request = RequestFactory.parseRequest(json_str, None)
+      request = request_factory.parseRequest(json_str, None)
     except MissingRequestType:
       assert True
     else:
@@ -126,7 +129,7 @@ class TestRequestJSON:
     """
 
     try:
-      request = RequestFactory.parseRequest(json_str, None)
+      request = request_factory.parseRequest(json_str, None)
     except MalformedRequest:
       assert True
     else:
@@ -138,7 +141,7 @@ class TestRequestJSON:
     """
 
     try:
-      request = RequestFactory.parseRequest(json_str, None)
+      request = request_factory.parseRequest(json_str, None)
     except MalformedRequest:
       assert True
     else:
@@ -146,7 +149,7 @@ class TestRequestJSON:
 
 class TestCredentialsJSON:
   def setup_method(self, method):
-    CredentialsFactory.CREDENTIALS_TYPES = {}
+    credentials_factory.credentials_types = {}
 
     class SampleCredentials(Credentials):
       CREDENTIALS_TYPE = "SampleCredentials"
@@ -154,7 +157,7 @@ class TestCredentialsJSON:
       def __init__(self, args = {}, database = None):
         self.args = args
 
-    CredentialsFactory.registerCredentialsType(SampleCredentials)
+    credentials_factory.registerCredentialsType(SampleCredentials)
 
   def test_Json(self):
     json_str = """{
@@ -168,7 +171,7 @@ class TestCredentialsJSON:
     }
     """
 
-    credentials = CredentialsFactory.parseCredentials(json_str, None)
+    credentials = credentials_factory.parseCredentials(json_str, None)
 
     assert 1 == int(credentials.args["first"])
     assert 2 == int(credentials.args["second"])
@@ -182,7 +185,7 @@ class TestCredentialsJSON:
     }
     """
 
-    credentials = CredentialsFactory.parseCredentials(json_str, None)
+    credentials = credentials_factory.parseCredentials(json_str, None)
 
     assert "SampleCredentials" == credentials.CREDENTIALS_TYPE
 
@@ -198,7 +201,7 @@ class TestCredentialsJSON:
     """
 
     try:
-      credentials = CredentialsFactory.parseCredentials(json_str, None)
+      credentials = credentials_factory.parseCredentials(json_str, None)
     except MissingCredentialsType:
       assert True
     else:
@@ -217,7 +220,7 @@ class TestCredentialsJSON:
     """
 
     try:
-      credentials = CredentialsFactory.parseCredentials(json_str, None)
+      credentials = credentials_factory.parseCredentials(json_str, None)
     except MalformedCredentials:
       assert True
     else:
@@ -229,7 +232,7 @@ class TestCredentialsJSON:
     """
 
     try:
-      credentials = CredentialsFactory.parseCredentials(json_str, None)
+      credentials = credentials_factory.parseCredentials(json_str, None)
     except MalformedCredentials:
       assert True
     else:

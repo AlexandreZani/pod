@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-#   Copyright 2010 Alexandre Zani (alexandre.zani@gmail.com) 
+#   Copyright 2010-2011 Alexandre Zani (alexandre.zani@gmail.com) 
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -16,23 +16,24 @@
 
 from pod.requests import *
 
-class TestRequestFactory(object):
+class Testrequest_factory(object):
   def setup_method(self, method):
-    RequestFactory.REQUEST_TYPES = {}
+    global request_factory
+    request_factory = RequestFactory()
 
   def test_registration(self):
     class SampleRequest(Request):
       REQUEST_TYPE = "SampleRequest"
-    RequestFactory.registerRequestType(SampleRequest)
+    request_factory.registerRequestType(SampleRequest)
 
-    assert SampleRequest == RequestFactory.REQUEST_TYPES["SampleRequest"]
+    assert SampleRequest == request_factory.request_types["SampleRequest"]
 
   def test_failedRegistrationNotImplemented(self):
     class SampleBadRequest(Request):
       pass
 
     try:
-      RequestFactory.registerRequestType(SampleBadRequest)
+      request_factory.registerRequestType(SampleBadRequest)
     except AttributeError:
       assert True
     else:
@@ -43,7 +44,7 @@ class TestRequestFactory(object):
       pass
 
     try:
-      RequestFactory.registerRequestType(SampleBadRequest)
+      request_factory.registerRequestType(SampleBadRequest)
     except AttributeError:
       assert True
     else:
@@ -56,15 +57,15 @@ class TestRequestFactory(object):
       def __init__(self, args = {}, credentials = None):
         pass
 
-    RequestFactory.registerRequestType(SampleRequest)
+    request_factory.registerRequestType(SampleRequest)
 
-    request = RequestFactory.getRequest("SampleRequest", {}, None)
+    request = request_factory.getRequest("SampleRequest", {}, None)
 
     assert "SampleRequest" == request.REQUEST_TYPE
 
   def test_getRequestWrong(self):
     try:
-      request = RequestFactory.getRequest("SampleRequest", {}, None)
+      request = request_factory.getRequest("SampleRequest", {}, None)
     except UnknownRequest:
       assert True
     else:
@@ -73,12 +74,12 @@ class TestRequestFactory(object):
   def test_unregistration(self):
     class SampleRequest(Request):
       REQUEST_TYPE = "SampleRequest"
-    RequestFactory.registerRequestType(SampleRequest)
+    request_factory.registerRequestType(SampleRequest)
 
-    RequestFactory.unregisterRequestType(SampleRequest)
+    request_factory.unregisterRequestType(SampleRequest)
 
     try:
-      request = RequestFactory.getRequest("SampleRequest", {}, None)
+      request = request_factory.getRequest("SampleRequest", {}, None)
     except UnknownRequest:
       assert True
     else:
@@ -88,12 +89,12 @@ class TestRequestFactory(object):
     class SampleRequest(Request):
       REQUEST_TYPE = "SampleRequest"
 
-    RequestFactory.registerRequestType(SampleRequest)
+    request_factory.registerRequestType(SampleRequest)
 
-    RequestFactory.unregisterRequestType(SampleRequest)
+    request_factory.unregisterRequestType(SampleRequest)
 
     try:
-      RequestFactory.unregisterRequestType(SampleRequest)
+      request_factory.unregisterRequestType(SampleRequest)
     except UnknownRequest:
       assert True
     else:

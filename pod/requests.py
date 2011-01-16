@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-#   Copyright 2010 Alexandre Zani (alexandre.zani@gmail.com) 
+#   Copyright 2010-2011 Alexandre Zani (alexandre.zani@gmail.com) 
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -21,36 +21,34 @@ class RequestFactory(object):
   """ This factory class holds the different available request types and
   generates request objects which can then be executed.
   """
-  REQUEST_TYPES = {}
+  def __init__(self):
+    self.request_types = {}
 
-  @staticmethod
-  def registerRequestType(request):
+  def registerRequestType(self, request):
     """ Adds an available request type.
     """
-    RequestFactory.REQUEST_TYPES[request.REQUEST_TYPE] = request
+    self.request_types[request.REQUEST_TYPE] = request
 
-  @staticmethod
-  def unregisterRequestType(request):
+  def unregisterRequestType(self, request):
     """ Removes an available request type.
     """
     try:
-      del RequestFactory.REQUEST_TYPES[request.REQUEST_TYPE]
+      del self.request_types[request.REQUEST_TYPE]
     except KeyError:
       raise UnknownRequest("Unknown request: " + request.REQUEST_TYPE)
 
-  @staticmethod
-  def getRequest(request_type, args, credentials):
+  def getRequest(self, request_type, args, credentials):
     """ Returns a request object of the corresponding request type
     """
     try:
-      request = RequestFactory.REQUEST_TYPES[request_type]
+      request = self.request_types[request_type]
     except KeyError:
       raise UnknownRequest("Unknown request: " + request_type)
 
     return request(args, credentials)
 
-  @staticmethod
-  def parseRequest(request_str, credentials=None, auth_db=None):
+  def parseRequest(self, request_str, credentials=None, auth_db=None,
+      credentials_factory=None):
     try:
       msg = json.loads(request_str)
       request_dict = msg["request"]
@@ -69,16 +67,16 @@ class RequestFactory(object):
     except KeyError:
       request_args = {}
 
-    if credentials == None:
+    if credentials == None and credentials_factory != None:
       try:
         credentials_dict = msg["credentials"]
-        credentials = CredentialsFactory.parseCredentials(
+        credentials = credentials_factory.parseCredentials(
             credentials_dict=credentials_dict,
             database=auth_db)
       except KeyError:
         credentials = None
 
-    return RequestFactory.getRequest(request_type, request_args, credentials)
+    return self.getRequest(request_type, request_args, credentials)
 
 
 def abstract():

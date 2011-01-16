@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-#   Copyright 2010 Alexandre Zani (alexandre.zani@gmail.com) 
+#   Copyright 2010-2011 Alexandre Zani (alexandre.zani@gmail.com) 
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -20,36 +20,33 @@ class CredentialsFactory(object):
   """ This factory class holds the different available credential
   types and generates credentials object which can then be verified.
   """
-  CREDENTIALS_TYPES = {}
+  def __init__(self):
+    self.credentials_types = {}
 
-  @staticmethod
-  def registerCredentialsType(cred_type):
+  def registerCredentialsType(self, cred_type):
     """ Registers a new credentials type
     """
-    CredentialsFactory.CREDENTIALS_TYPES[cred_type.CREDENTIALS_TYPE] = cred_type
+    self.credentials_types[cred_type.CREDENTIALS_TYPE] = cred_type
 
-  @staticmethod
-  def unregisterCredentialsType(cred_type):
+  def unregisterCredentialsType(self, cred_type):
     """ Unregisters a credentials type
     """
     try:
-      del CredentialsFactory.CREDENTIALS_TYPES[cred_type]
+      del self.credentials_types[cred_type]
     except KeyError:
       raise UnknownCredentials("Unknown credentials" + cred_type)
 
-  @staticmethod
-  def getCredentials(cred_type, args, database):
+  def getCredentials(self, cred_type, args, database):
     """ Gets a credentials object
     """
     try:
-      cred_class = CredentialsFactory.CREDENTIALS_TYPES[cred_type]
+      cred_class = self.credentials_types[cred_type]
     except KeyError:
       raise UnknownCredentials("Unknown credentials: " + cred_type)
 
     return cred_class(args, database)
 
-  @staticmethod
-  def parseCredentials(credentials_str=None, database=None, credentials_dict=None):
+  def parseCredentials(self, credentials_str=None, database=None, credentials_dict=None):
     if credentials_dict == None:
       try:
         credentials_dict = json.loads(credentials_str)["credentials"]
@@ -68,7 +65,7 @@ class CredentialsFactory(object):
     except KeyError:
       credentials_args = None
 
-    return CredentialsFactory.getCredentials(credentials_type, credentials_args, database)
+    return self.getCredentials(credentials_type, credentials_args, database)
 
 def abstract():
   import inspect
